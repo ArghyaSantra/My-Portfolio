@@ -3,6 +3,7 @@
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
+import { easeInOut } from "framer-motion";
 
 export default function FadeInSection({
   children,
@@ -30,7 +31,7 @@ export default function FadeInSection({
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeInOut,
         delay,
       },
     },
