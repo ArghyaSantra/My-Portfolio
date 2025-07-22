@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import emailjs from "emailjs-com";
+import { useState } from "react";
 
 const formSchema = z.object({
   subject: z.string().min(6, "Subject must be at least 6 characters."),
@@ -21,6 +22,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function ContactSection() {
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,11 +35,11 @@ export default function ContactSection() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    console.log(process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID);
     try {
+      setLoading(true);
       const result = await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!, // e.g. service_abc123
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!, // e.g. template_xyz456
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
         {
           from_name: data.name,
           from_email: data.email,
@@ -44,7 +47,7 @@ export default function ContactSection() {
           name: data.name,
           message: data.message,
         },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY! // e.g. B7hf7uS...
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
       );
 
       if (result.status === 200) {
@@ -54,6 +57,8 @@ export default function ContactSection() {
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
       console.error("EmailJS Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,14 +96,14 @@ export default function ContactSection() {
               target="_blank"
               rel="noreferrer"
             >
-              <Github className="w-5 h-5 hover:text-green-400" />
+              <Github className="w-5 h-5 hover:text-green-400 transition" />
             </a>
             <a
               href="https://linkedin.com/in/arghya-santra"
               target="_blank"
               rel="noreferrer"
             >
-              <Linkedin className="w-5 h-5 hover:text-green-400" />
+              <Linkedin className="w-5 h-5 hover:text-green-400 transition" />
             </a>
           </div>
         </motion.div>
@@ -110,17 +115,22 @@ export default function ContactSection() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <Input placeholder="Subject" {...form.register("subject")} />
-
           <Input placeholder="Your Name" {...form.register("name")} />
           <Input placeholder="Your Email" {...form.register("email")} />
+          <Input placeholder="Message title" {...form.register("subject")} />
           <Textarea
             placeholder="Your Message"
             rows={5}
             {...form.register("message")}
           />
-          <Button type="submit" className="w-fit mt-2">
-            Send Message
+
+          <Button
+            type="submit"
+            className="w-fit mt-2 flex items-center gap-2 hover:bg-green-500 hover:text-black transition"
+            disabled={loading}
+          >
+            {loading && <Loader2 className="animate-spin w-4 h-4" />}
+            {loading ? "Sending..." : "Send Message"}
           </Button>
         </motion.form>
       </div>

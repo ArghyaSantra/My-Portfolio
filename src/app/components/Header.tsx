@@ -71,7 +71,7 @@ export default function Header() {
 
         <Button
           size="sm"
-          className="hidden md:block cursor-pointer"
+          className="hidden md:block cursor-pointer hover:bg-green-500 hover:text-black transition"
           onClick={() =>
             toast.custom((t) => <ToastContactForm toastId={t.id} />)
           }
