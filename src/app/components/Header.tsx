@@ -16,6 +16,10 @@ const navItems = [
   { id: "contact", label: "Contact" },
 ];
 
+type ToastProps = {
+  toastId: string | number;
+};
+
 export default function Header() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -71,9 +75,11 @@ export default function Header() {
 
         <Button
           size="sm"
-          className="hidden md:block cursor-pointer hover:bg-green-500 hover:text-black transition"
+          className="hidden md:block cursor-pointer "
           onClick={() =>
-            toast.custom((t) => <ToastContactForm toastId={t.id} />)
+            toast.custom((id: string | number) => (
+              <ToastContactForm toastId={id} />
+            ))
           }
         >
           Let’s Talk
